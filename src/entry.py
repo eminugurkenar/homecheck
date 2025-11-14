@@ -36,4 +36,8 @@ class Default(WorkerEntrypoint):
         if not row:
             return Response("No data found", status=404)
 
-        return Response.json(row)
+        return Response.json({
+            "deviceId": row.deviceId[:5],
+            "timestamp": row.timestamp,
+            "data": json.loads(row.data)
+        })
