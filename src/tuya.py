@@ -5,9 +5,11 @@ import hmac
 import json
 from typing import Any, Dict, Optional, Tuple
 
-class TuyaApi:
-    def __init__(self, endpoint: str, access_id: str, access_secret: str, lang: str = "en"):
 
+class TuyaApi:
+    def __init__(
+        self, endpoint: str, access_id: str, access_secret: str, lang: str = "en"
+    ):
         self.client = httpx.AsyncClient(timeout=10.0)
         self.endpoint = endpoint
         self.access_id = access_id
@@ -22,7 +24,6 @@ class TuyaApi:
         params: Optional[Dict[str, Any]] = None,
         body: Optional[Dict[str, Any]] = None,
     ) -> Tuple[str, int]:
-
         # HTTPMethod
         str_to_sign = method
         str_to_sign += "\n"
@@ -33,8 +34,7 @@ class TuyaApi:
         )
 
         str_to_sign += (
-            hashlib.sha256(content_to_sha256.encode(
-                "utf8")).hexdigest().lower()
+            hashlib.sha256(content_to_sha256.encode("utf8")).hexdigest().lower()
         )
         str_to_sign += "\n"
 
@@ -71,7 +71,14 @@ class TuyaApi:
         )
         return sign, t
 
-    def __request(self, access_token: str, method: str, path: str, params: Optional[Dict[str, Any]] = None, body: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def __request(
+        self,
+        access_token: str,
+        method: str,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        body: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         t = str(int(time.time() * 1000))
 
         sign, t = self._calculate_sign(access_token, method, path, params, body)
@@ -89,10 +96,12 @@ class TuyaApi:
             url=self.endpoint + path,
             params=params,
             headers=headers,
-            content=body
+            content=body,
         )
 
         return response
 
-    def get(self, access_token: str, path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get(
+        self, access_token: str, path: str, params: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         return self.__request(access_token, "GET", path, params, None)
