@@ -38,7 +38,12 @@
 			"database_id": "7dc4dd1c-36fc-4d28-aa4a-4dfd64a363e2",
 			"remote": true
 		}
-	]
+	],
+	"triggers": {
+		"crons": [
+		  "* * * * *",
+		]
+	}
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
