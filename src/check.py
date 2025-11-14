@@ -37,4 +37,6 @@ async def check(
             "size": 50,
         },
     )
-    return {"status": device_status.json(), "log": device_logs.json()}
+
+    data = {"status": device_status.json(), "log": device_logs.json()}
+    return data
