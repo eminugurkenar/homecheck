@@ -43,7 +43,11 @@
 		"crons": [
 		  "*/10 * * * *",
 		]
-	}
+	},
+	"assets": {
+		"directory": "./assets/",
+		"binding": "ASSETS"
+	},
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

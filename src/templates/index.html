@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HomeCheck</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ status.get('product_name', 'Device') }} — {{ status.get('name', '') }}</h1>
+            <div class="meta">
+                <span>Model: <strong>{{ status.get('model') }}</strong></span>
+            </div>
+        </header>
+
+
+        <section class="card">
+            <h2>Quick status</h2>
+            <ul class="kv">
+                <li><strong>Online: </strong>{{ 'Yes' if status.get('online') else 'No' }}</li>
+                <li><strong>Timezone</strong> {{ status.get('time_zone') }}</li>
+                <li><strong>Check time (unix)</strong> {{ check.get('time') }}</li>
+                <li><strong>Update time (unix)</strong> {{ status.get('update_time') }}</li>
+            </ul>
+        </section>
+
+
+        <section class="card">
+            <h2>Statuses</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in status.get('status', []) %}
+                    <tr>
+                        <td>{{ s.code }}</td>
+                        <td>{{ s.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+
+        <section class="card">
+            <h2>Logs (most recent first)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event time</th>
+                        <th>Code</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in log.get('logs', []) %}
+                    <tr>
+                        <td>{{ entry.event_time }}</td>
+                        <td>{{ entry.code }}</td>
+                        <td>{{ entry.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+</body>
+
+</html>

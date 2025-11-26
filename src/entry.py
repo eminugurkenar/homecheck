@@ -1,7 +1,11 @@
 import json
 import time
+from urllib.parse import urlparse
+from pathlib import Path
 from workers import Response, WorkerEntrypoint
 from check import check
+from jinja2 import Template
+
 
 
 class Default(WorkerEntrypoint):
@@ -25,6 +29,11 @@ class Default(WorkerEntrypoint):
         )
 
     async def fetch(self, request):
+        url = urlparse(request.url)
+
+        if url.path in ["/static/style.css"]:
+            return await self.env.ASSETS.fetch(request)
+
         stmt = """
             SELECT deviceId, timestamp, data
             FROM device_logs
@@ -36,8 +45,20 @@ class Default(WorkerEntrypoint):
         if not row:
             return Response("No data found", status=404)
 
-        return Response.json({
-            "deviceId": row.deviceId[:5],
-            "timestamp": row.timestamp,
-            "data": json.loads(row.data)
-        })
+        data = {
+            "device": {
+                "id": row.deviceId,
+            },
+            "check": {
+                "time": row.timestamp,
+            },
+            "status": json.loads(row.data)["status"]["result"],
+            "log": json.loads(row.data)["log"]["result"]
+        }
+
+        html_file = Path(__file__).parent / "templates/index.html"
+
+        template = Template(html_file.read_text())
+        html = template.render(check=data["check"],status=data["status"],log=data["log"])
+
+        return Response(html, headers={"Content-Type": "text/html"})
