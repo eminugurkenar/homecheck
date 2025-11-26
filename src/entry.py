@@ -31,7 +31,7 @@ class Default(WorkerEntrypoint):
             )
 
     async def fetch(self, request):
-        status = 200
+        status_code = 200
         url = urlparse(request.url)
 
         if url.path in ["/static/style.css"]:
@@ -52,7 +52,7 @@ class Default(WorkerEntrypoint):
         for device_id in device_ids:
             row = await self.env.DB.prepare(stmt).bind(device_id).first()
             if not row:
-                status = 404
+                status_code = 404
 
                 devices.append({
                     "device": {
@@ -84,7 +84,8 @@ class Default(WorkerEntrypoint):
         template = env.from_string(html_file.read_text())
         html = template.render(devices=devices)
 
-        return Response(html, status=status, headers={"Content-Type": "text/html"} )
+        return Response(html, status=status_code, headers={"Content-Type": "text/html"} )
+
 
 def gmt3_filter(timestamp):
     if timestamp is None:
