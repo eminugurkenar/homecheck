@@ -4,9 +4,8 @@ from urllib.parse import urlparse
 from pathlib import Path
 from workers import Response, WorkerEntrypoint
 from check import check
-from jinja2 import Template
-
-
+from jinja2 import Environment, Template
+from datetime import datetime, timezone, timedelta
 
 class Default(WorkerEntrypoint):
     async def scheduled(self, controller, env, ctx):
@@ -58,7 +57,20 @@ class Default(WorkerEntrypoint):
 
         html_file = Path(__file__).parent / "templates/index.html"
 
-        template = Template(html_file.read_text())
+        def gmt3_filter(timestamp):
+            if timestamp is None:
+                return ""
+
+            if timestamp > 1e12:
+                timestamp = timestamp / 1000
+
+            dt = datetime.fromtimestamp(timestamp , tz=timezone.utc)  # parse as UTC
+            dt = dt + timedelta(hours=3)  # shift to GMT+3
+            return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        env = Environment()
+        env.filters['gmt3'] = gmt3_filter
+        template = env.from_string(html_file.read_text())
         html = template.render(check=data["check"],status=data["status"],log=data["log"])
 
         return Response(html, headers={"Content-Type": "text/html"})
