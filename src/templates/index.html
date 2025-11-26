@@ -61,7 +61,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for entry in log.get('logs', []) %}
+                    {% for entry in log.get('logs', [])[:5] %}
                     <tr>
                         <td>{{ entry.event_time | gmt3 }}</td>
                         <td>{{ entry.code }}</td>
