@@ -23,8 +23,8 @@
             <ul class="kv">
                 <li><strong>Online: </strong>{{ 'Yes' if status.get('online') else 'No' }}</li>
                 <li><strong>Timezone</strong> {{ status.get('time_zone') }}</li>
-                <li><strong>Check time (unix)</strong> {{ check.get('time') | gmt3 }}</li>
-                <li><strong>Update time (unix)</strong> {{ status.get('update_time') | gmt3 }}</li>
+                <li><strong>Check time</strong> {{ check.get('time') | gmt3 }}</li>
+                <li><strong>Update time</strong> {{ status.get('update_time') | gmt3 }}</li>
             </ul>
         </section>
 
