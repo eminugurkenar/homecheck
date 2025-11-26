@@ -38,6 +38,7 @@ class Default(WorkerEntrypoint):
             return await self.env.ASSETS.fetch(request)
 
         device_ids = [d.strip() for d in self.env.TUYA_DEVICE_IDS.split(",") if d.strip()]
+        device_ids.append("ac180p")
 
         stmt = """
             SELECT deviceId, timestamp, data
