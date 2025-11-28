@@ -2,3 +2,4 @@
 ( done ) * static ui
 * json data verify
 * db regular clean up old data, for 500mb limit
+* status codes verify

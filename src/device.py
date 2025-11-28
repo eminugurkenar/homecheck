@@ -8,6 +8,8 @@ class StatusItem(BaseModel):
     class Config:
         extra = "forbid"
 
+    def verify(self) -> bool:
+        return True
 
 class StatusResult(BaseModel):
     active_time: int
@@ -36,6 +38,12 @@ class StatusResult(BaseModel):
     class Config:
         extra = "forbid"
 
+    def verify(self) -> bool:
+        for item in self.status:
+            if not item.verify():
+                return False
+        return True
+
 
 class StatusWrapper(BaseModel):
     result: StatusResult
@@ -46,6 +54,9 @@ class StatusWrapper(BaseModel):
     class Config:
         extra = "forbid"
 
+    def verify(self) -> bool:
+        return self.result.verify()
+
 
 class LogItem(BaseModel):
     code: str
@@ -54,6 +65,9 @@ class LogItem(BaseModel):
 
     class Config:
         extra = "forbid"
+
+    def verify(self) -> bool:
+        return True
 
 
 class LogResult(BaseModel):
@@ -65,6 +79,12 @@ class LogResult(BaseModel):
     class Config:
         extra = "forbid"
 
+    def verify(self) -> bool:
+        for log_item in self.logs:
+            if not log_item.verify():
+                return False
+        return True
+
 
 class LogWrapper(BaseModel):
     result: LogResult
@@ -75,6 +95,9 @@ class LogWrapper(BaseModel):
     class Config:
         extra = "forbid"
 
+    def verify(self) -> bool:
+        return self.result.verify()
+
 
 class Device(BaseModel):
     status: StatusWrapper
@@ -82,3 +105,6 @@ class Device(BaseModel):
 
     class Config:
         extra = "forbid"
+
+    def verify(self) -> bool:
+        return self.status.verify() and self.log.verify()
