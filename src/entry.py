@@ -3,21 +3,24 @@ import time
 from urllib.parse import urlparse
 from pathlib import Path
 from workers import Response, WorkerEntrypoint
-from check import check
 from jinja2 import Environment, Template
 from datetime import datetime, timezone, timedelta
+from tuya import get_tuya_device
+from device import Device
 
 class Default(WorkerEntrypoint):
     async def scheduled(self, controller, env, ctx):
         device_ids = [d.strip() for d in self.env.TUYA_DEVICE_IDS.split(",") if d.strip()]
 
         for device_id in device_ids:
-            data = await check(
+            data = await get_tuya_device(
                 self.env.TUYA_API_ENDPOINT,
                 self.env.TUYA_ACCESS_ID,
                 self.env.TUYA_ACCESS_KEY,
                 device_id,
             )
+
+            Device.parse_obj(data)
 
             now = int(time.time() * 1000)
             stmt = """
