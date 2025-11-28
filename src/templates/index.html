@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
+<div class="return-code">
+    <strong>Status code:</strong> {{ status }}
+</div>
+
 {% for device in devices %}
 <div class="container">
     <header>
@@ -20,7 +24,9 @@
     <section class="card">
         <h2>Quick status</h2>
         <ul class="kv">
-            <li><strong>Online: </strong>{{ 'Yes' if device.status.get('online') else 'No' }}</li>
+            <li style="color: {{ 'red' if not device.status.get('online') else 'black' }}">
+                <strong>Online: </strong>{{ 'Yes' if device.status.get('online') else 'No' }}
+            </li>            
             <li><strong>Timezone</strong> {{ device.status.get('time_zone') }}</li>
             <li><strong>Check time</strong> {{ device.check.get('time') | gmt3 }}</li>
             <li><strong>Update time</strong> {{ device.status.get('update_time') | gmt3 }}</li>

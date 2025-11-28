@@ -7,6 +7,7 @@ from jinja2 import Environment, Template
 from datetime import datetime, timezone, timedelta
 from tuya import get_tuya_device
 from device import Device
+from pydantic import ValidationError
 
 class Default(WorkerEntrypoint):
     async def scheduled(self, controller, env, ctx):
@@ -20,7 +21,11 @@ class Default(WorkerEntrypoint):
                 device_id,
             )
 
-            Device.parse_obj(data)
+            # verify data is correct, if not do not write to db
+            try:
+                Device.parse_obj(data)
+            except ValidationError as e:
+                continue
 
             now = int(time.time() * 1000)
             stmt = """
@@ -55,20 +60,32 @@ class Default(WorkerEntrypoint):
 
         for device_id in device_ids:
             row = await self.env.DB.prepare(stmt).bind(device_id).first()
+
             if not row:
                 status_code = 404
 
                 devices.append({
                     "device": {
-                        "id": "not found",
+                        "id": "unknown",
                     },
                     "check": {
                         "time": None
                     },
-                    "status": {},
+                    "status": {
+                        "product_name": "unknown",
+                        "name": "unknown",
+                        "model": "unknown",
+                        "online": False
+                    },
                     "log": {}
                 })
                 continue
+
+            # verify data is correct, if not change return code
+            try:
+                Device.parse_obj(json.loads(row.data))
+            except ValidationError as e:
+                status_code = 405
 
             devices.append({
                 "device": {
@@ -86,7 +103,7 @@ class Default(WorkerEntrypoint):
         env = Environment()
         env.filters['gmt3'] = gmt3_filter
         template = env.from_string(html_file.read_text())
-        html = template.render(devices=devices)
+        html = template.render(status=status_code ,devices=devices)
 
         return Response(html, status=status_code, headers={"Content-Type": "text/html"} )
 
